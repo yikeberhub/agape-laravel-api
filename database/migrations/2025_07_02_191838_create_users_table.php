@@ -17,6 +17,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('email');
+            $table->string('password');
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');
@@ -26,6 +27,8 @@ return new class extends Migration
             $table->enum('role',['admin','field_worker'])->default('field_worker');
             $table->boolean('is_active')->default(false);
             $table->boolean('is_deleted')->default(false);
+            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
             $table->timestamps();
         });
     }
