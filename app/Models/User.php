@@ -4,13 +4,17 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use App\Models\Disability;
+
+
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -29,7 +33,7 @@ class User extends Authenticatable
         'role',
         'is_active',
         'is_deleted',
-        
+        'email_verified_at',
     ];
 
     /**
@@ -52,6 +56,6 @@ class User extends Authenticatable
     ];
     
     public function disabilityRecords(){
-        return $this->hasMany(Disability::class,'recorder_id');
+        return $this->hasMany(Disability::class);
     }
 }

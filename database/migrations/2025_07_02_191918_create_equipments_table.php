@@ -15,6 +15,9 @@ return new class extends Migration
     {
         Schema::create('equipments', function (Blueprint $table) {
             $table->id();
+            $table->string('type')->nullable();
+            $table->string('size');
+            $table->string('cause_of_need')->nullable();
             $table->timestamps();
         });
     }

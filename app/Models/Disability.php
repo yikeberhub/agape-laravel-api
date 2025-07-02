@@ -2,6 +2,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Warrant;
+use App\Models\Equipment;
 
 class Disability extends Model
 {
@@ -31,10 +34,9 @@ class Disability extends Model
         'is_deleted',
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'recorder_id');
-    }
+    public function user(){
+    return $this->belongsTo(User::class, 'recorder_id');
+}
 
     public function warrant()
     {
@@ -45,4 +47,6 @@ class Disability extends Model
     {
         return $this->belongsTo(Equipment::class, 'equipment_id');
     }
+
+    
 }
