@@ -1,0 +1,37 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agape-mobility-api
+    container_name: agape-mobility-api
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:base64:5mIz7s1q0GFyIt6CgxStOAnlN+EK0ni6aYaewtnwqqs= # Replace with your generated APP_KEY
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=agape_db              # Your database name
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+
+  db:
+    image: mysql:5.7
+    container_name: mysql_db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: agape_db            # Ensure this matches your DB_DATABASE
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
