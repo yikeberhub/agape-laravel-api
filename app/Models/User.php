@@ -18,9 +18,18 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'gender',
+        'phone_number',
+        'profile_image',
+        'role',
+        'is_active',
+        'is_deleted',
+        
     ];
 
     /**
@@ -41,4 +50,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    
+    public function disabilityRecords(){
+        return $this->hasMany(Disability::class,'recorder_id');
+    }
 }
