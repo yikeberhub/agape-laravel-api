@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Password;
 use App\Mail\EmailVerificationMailable;
+use App\Mail\ResetOtpMailable;
 
 
 use App\Http\Requests\RegisterRequest;
@@ -120,27 +121,68 @@ public function login(Request $request)
 
     public function resetPassword(Request $request)
     {
-        // Handle password reset
+        $request->validate([
+            'email' => 'required|email',
+            'phone_number' => 'required|string',
+        ]);
+    
+        $user = User::where('email', $request->email)
+                    ->orWhere('phone_number', $request->phone_number)
+                    ->first();
+    
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+    
+        $otp = rand(100000, 999999);
+    
+        Mail::to($user->email)->send(new ResetOtpMailable($otp,$user->first_name));
+    
+        return jsonResponse(true, 'OTP sent successfully', [
+            'user_id'=>$user->id,
+        ],200);
     }
 
     public function verifyOTP(Request $request)
     {
-        // Handle OTP verification
+        $request->validate([
+            'otp'=>'required|numeric',
+        ]);
+        $correctedOtp = 1234;
+
+        if($request->otp==$correctedOtp){
+            return jsonResponse(true,'otp verified successfully',null,200);
+        }
+        return jsonResponse(false,'Invalid otp',null,400);
     }
 
     public function setNewPassword(Request $request)
     {
-        // Handle setting a new password
+        $request->validate([
+            'password'=>'reqired|string|min:8|',
+            'email'=>'required|email',
+        ]);
+
+        $user = User::where('email',$request->email)->first();
+        if(!$user){
+            return jsonResponse(false,'User not found',null,404);
+
+            $user->password=bcrypt($request->password);
+            $user->save();
+        }
+        return jsonResponse(true,'Password updated successfully',null,200);
+
     }
 
     public function logout(Request $request)
     {
-        // Handle user logout
+        $request->user()->currentAccessToken()->delete();
+        return jsonResponse(true,'successfully logged out!',null,200);
     }
 
-    public function currentUserProfile()
+    public function currentUserProfile(Request $request)
     {
-        // Return current user's profile
+        return jsonResponse(true,'user profile',['user'=>$request->user()],200);
     }
 }
 

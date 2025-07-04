@@ -11,16 +11,17 @@ class ResetOtpMailable extends Mailable
     use Queueable, SerializesModels;
 
     public $otp;
+    public $name;
 
-    public function __construct($otp)
+    public function __construct($otp,$name)
     {
         $this->otp = $otp;
+        $this->name=$name;
     }
 
     public function build()
     {
-        print('this email is printing');
         return $this->view('resetOtpEmail')
-                    ->with(['otp' => $this->otp]);
+                    ->with(['otp' => $this->otp,'name'=>$this->name]);
     }
 }
