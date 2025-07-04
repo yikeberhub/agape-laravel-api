@@ -1,51 +1,61 @@
+<?php
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Password;
+use App\Mail\EmailVerificationMailable;
 
 use App\Http\Requests\RegisterRequest;
+use Exception;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
         // Handle user registration
-        if($request->user()->role !='admin'){
-            return response()->json([
-                'message' => 'Unauthorized',
-            ], 403);
+        if ($request->user() && $request->user()->role != 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        //create users
+        // Create user
+        try{
+            $user = User::create([
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+                'first_name' => $request->first_name,
+                'middle_name' => $request->middle_name,
+                'last_name' => $request->last_name,
+                'gender' => $request->gender,
+                'phone_number' => $request->phone_number,
+            ]);
+            
 
-        $user = User::create([
-            'email': $request->email,
-            'password': Hash::make($request->password),
-            'role': $request->role,
-            'first_name': $request->first_name,
-            'middle_name':$request->middle_name,
-            'last_name': $request->last_name,
-            'gender':$request->gender,
-            'phone_number': $request->phone_number,
+        $token = Password::getRepository()->create($user);
+        $encodedId = base64_encode($user->id);
+        $app_url = env('APP_URL');
+        $verificationLink = $app_url . '/api/auth/email-verify?uid=' . $encodedId . '&token=' . $token;            
+        Mail::to($user->email)->send(new EmailVerificationMailable($verificationLink));
+        return response()->json(['message' => 'User created successfully, please verify your email'], 201);
 
-            ])
 
-        $token = Password.getRepository()->create($user);
-        $verificationLink = url('api/auth/email-verify?uid='.Str:encode($user->id).'&token='.$token);
-
-        Mail::send('emails.verify',['link'=>$verificationLink],funcation($message) use($user){
-            $message->to($user->email);
-            $mesage->subject('Email Verification for agape mobility');
-        });
-
-        return response()->json([
-            'message'=>'user created successfully please verify your email',
-            ],201)
+    }catch(QueryException $e){
+        return response()->json(['success'=>false,
+        'message'=>'Database error'.$e->getMessage()], 400);
     }
+    catch(Exception $e){
+        return response()->json(['success'=>false,
+        'message' => 'An error occurred: ' . $e->getMessage(),],
+        500);
+    }
+
+}
 
     public function verifyEmail(Request $request)
     {
@@ -87,3 +97,4 @@ class AuthController extends Controller
         // Return current user's profile
     }
 }
+

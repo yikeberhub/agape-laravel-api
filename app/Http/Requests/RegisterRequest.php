@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
@@ -21,5 +23,13 @@ class RegisterRequest extends FormRequest
             'role'=>'required|string|max:50',
             'phone_number'=>'required|string|max:11',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new ValidationException($validator,$response()->json([
+            'success' => false,
+            'errors'=>$validator->errors(),
+        ]));
     }
 }
