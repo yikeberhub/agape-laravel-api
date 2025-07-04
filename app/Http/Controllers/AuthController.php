@@ -42,7 +42,9 @@ class AuthController extends Controller
         $app_url = env('APP_URL');
         $verificationLink = $app_url . '/api/auth/email-verify?uid=' . $encodedId . '&token=' . $token;            
         Mail::to($user->email)->send(new EmailVerificationMailable($verificationLink));
-        return response()->json(['message' => 'User created successfully, please verify your email'], 201);
+        return response()->json(['success'=>true,
+        'message' => 'User created successfully, please verify your email'], 
+        201);
 
 
     }catch(QueryException $e){
@@ -60,6 +62,21 @@ class AuthController extends Controller
     public function verifyEmail(Request $request)
     {
         // Handle email verification
+        $request->validate([
+            'uid'=>'required|string',
+            'token'=>'required|string',
+
+        ]);
+
+        $userId = $request->input('uid');
+        $token = $request->input('token');
+
+        $user = User::find($userId);
+        if(!$user){
+            return response()->json(['success'=>true,
+            'message'=>'user not found',
+        ],404);
+        }
     }
 
     public function login(Request $request)
