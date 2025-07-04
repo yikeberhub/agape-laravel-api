@@ -1,4 +1,3 @@
-<!-- resources/views/emails/verify.blade.php -->
 <!DOCTYPE html>
 <html>
 <head>

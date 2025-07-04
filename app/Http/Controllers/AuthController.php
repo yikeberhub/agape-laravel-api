@@ -14,6 +14,7 @@ use App\Mail\EmailVerificationMailable;
 
 use App\Http\Requests\RegisterRequest;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -58,8 +59,7 @@ class AuthController extends Controller
         }
     }
 
-    public function verifyEmail(Request $request)
-{
+    public function verifyEmail(Request $request){
     $request->validate([
         'uid' => 'required|string',
         'token' => 'required|string',
@@ -89,10 +89,29 @@ class AuthController extends Controller
         'user_id' => $user->id,
     ]);
 }
-    public function login(Request $request)
-    {
-        // Handle user login
+
+public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
+
+    $credentials = $request->only('email', 'password');
+
+    if (Auth::attempt($credentials)) {
+        $user = Auth::user();
+        
+        $token = $user->createToken('authToken')->plainTextToken;
+
+        return jsonResponse(true, 'User logged in successfully', [
+            'token' => $token,
+            'user' => $user,
+        ]);
+    } else {
+        return jsonResponse(false, 'Invalid login credentials', null, 401);
     }
+}
 
     public function refreshToken(Request $request)
     {

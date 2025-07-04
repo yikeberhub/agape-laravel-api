@@ -16,9 +16,12 @@ Route::prefix('auth')->group(function () {
     Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
     Route::post('verify-otp', [AuthController::class, 'verifyOTP'])->name('verify.otp');
     Route::post('set-new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('profile', [AuthController::class, 'currentUserProfile'])->name('logged.in.profile');
+    Route::middleware('auth:sanctum')->group(function(){
+        Route::post('logout',[AuthController::class,'logout'])->name('logout');
+        Route::get('user/profile',[AuthController::class,'currentUserProfile'])->name('logged.in.profile');
+    });
 });
+
 
 Route::prefix('users')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('user.list.create');
