@@ -34,6 +34,7 @@ class User extends Authenticatable
         'is_active',
         'is_deleted',
         'email_verified_at',
+        'verification_token',
     ];
 
     /**
