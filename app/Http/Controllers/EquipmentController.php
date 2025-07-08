@@ -10,7 +10,7 @@ class EquipmentController extends Controller
 {
     public function index()
     {
-        $equipments = Equipment::where('is_deleted', false)->paginate(10);
+        $equipments = Equipment::where('is_deleted', false)->get();
         return jsonResponse(true, 'Equipments fetched successfully.', $equipments);
     }
 
