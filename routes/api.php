@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
@@ -23,10 +22,10 @@ Route::prefix('auth')->group(function () {
 });
 
 
-Route::prefix('users')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('user.list.create');
-    Route::post('/', [UserController::class, 'store'])->name('user.store');
-    Route::get('{id}', [UserController::class, 'show'])->name('user.detail');
+Route::prefix('users')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [UserController::class, 'getUsers'])->name('user.list');
+    Route::post('/create', [UserController::class, 'createUser'])->name('user.create');
+    Route::get('{id}', [UserController::class, 'showUserDetail'])->name('user.detail');
     Route::get('blocked', [UserController::class, 'blockedUsers'])->name('blocked.users');
     Route::post('{id}/block', [UserController::class, 'blockUser'])->name('block.user');
     Route::delete('{id}/delete', [UserController::class, 'deleteUser'])->name('delete.user');

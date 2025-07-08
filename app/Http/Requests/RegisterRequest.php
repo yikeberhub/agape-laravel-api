@@ -13,23 +13,29 @@ class RegisterRequest extends FormRequest
         return true;
     }
 
-   
     public function rules()
     {
         return [
-            'email'=>'required|email|unique:users,email',
-            'password'=>'required|min:8|confirmed',
-            'first_name'=>'required|string|max:255',
-            'role'=>'required|string|max:50',
-            'phone_number'=>'required|string|max:11',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8',
+            'first_name' => 'required|string|max:255',
+            'role' => 'required|string|max:50',
+            'phone_number' => 'required|string|max:11',
         ];
     }
 
     protected function failedValidation(Validator $validator)
     {
-        throw new ValidationException($validator,$response()->json([
+        $response = response()->json([
             'success' => false,
-            'errors'=>$validator->errors(),
-        ]));
+            'errors' => $this->formatErrors($validator->errors()),
+        ],422);
+
+        throw new ValidationException($validator, $response);
+    }
+
+    protected function formatErrors($errors)
+    {
+        return $errors->toArray(); 
     }
 }

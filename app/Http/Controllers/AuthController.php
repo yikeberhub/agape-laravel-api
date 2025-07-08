@@ -19,14 +19,12 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request) // Use RegisterRequest here
     {
-        // Handle user registration
         if ($request->user() && $request->user()->role != 'admin') {
             return jsonResponse(false, 'Unauthorized', null, 403);
         }
-    
-        // Create user
+
         try {
             $verificationToken = Str::random(60);
             $user = User::create([
@@ -38,27 +36,26 @@ class AuthController extends Controller
                 'last_name' => $request->last_name,
                 'gender' => $request->gender,
                 'phone_number' => $request->phone_number,
-                'verification_token'=>$verificationToken,
+                'verification_token' => $verificationToken,
             ]);
-    
-            $token = Password::getRepository()->create($user);
+
             $encodedId = base64_encode($user->id);
             $app_url = env('APP_URL');
             $verificationLink = $app_url . '/api/auth/email-verify?uid=' . $encodedId . '&token=' . $verificationToken;
-    
+
             Mail::to($user->email)->send(new EmailVerificationMailable($verificationLink));
-    
+
             return jsonResponse(true, 'User created successfully, please verify your email', [
                 'id' => $user->id,
                 'username' => $request->email
             ], 201);
-    
         } catch (QueryException $e) {
             return jsonResponse(false, 'Database error: ' . $e->getMessage(), null, 400);
         } catch (Exception $e) {
             return jsonResponse(false, 'An error occurred: ' . $e->getMessage(), null, 500);
         }
     }
+    
 
     public function verifyEmail(Request $request){
     $request->validate([
