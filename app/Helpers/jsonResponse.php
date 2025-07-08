@@ -8,9 +8,9 @@ if (!function_exists('jsonResponse')) {
             'message' => $message,
         ];
 
-        if ($success) {
-            $response['data'] = $data;
-        } else {
+        $response['data'] = $success ? $data : [];
+
+        if (!$success && $errors !== null) {
             $response['errors'] = $errors;
         }
 

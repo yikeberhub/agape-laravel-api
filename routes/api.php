@@ -24,13 +24,14 @@ Route::prefix('auth')->group(function () {
 
 Route::prefix('users')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [UserController::class, 'getUsers'])->name('user.list');
-    Route::post('/create', [UserController::class, 'createUser'])->name('user.create');
-    Route::get('{id}', [UserController::class, 'showUserDetail'])->name('user.detail');
-    Route::get('blocked', [UserController::class, 'blockedUsers'])->name('blocked.users');
+    Route::get('{details/id}', [UserController::class, 'showUserDetail'])->name('user.detail');
     Route::post('{id}/block', [UserController::class, 'blockUser'])->name('block.user');
     Route::delete('{id}/delete', [UserController::class, 'deleteUser'])->name('delete.user');
     Route::post('{id}/update-password', [UserController::class, 'updatePassword'])->name('update.password');
+    Route::post('create', [UserController::class, 'createUser'])->name('user.create');
+    Route::get('blocked', [UserController::class, 'blockedUsers'])->name('blocked.users');
     Route::get('filter', [UserController::class, 'filter'])->name('user.filter');
+
 });
 
 Route::prefix('warrants')->group(function () {

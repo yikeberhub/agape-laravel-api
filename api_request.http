@@ -1,0 +1,8 @@
+post http://localhost:8000/api/users/33/block
+Authorization: Bearer 9|DFYpXkOXyBfuJ53iKrBx7E3gZyrBigsBUqOhPAaAdecf0976
+Content-Type: application/json
+
+# {
+#     "email":"yikeber50@gmail.com",
+#     "password":"yike1234"
+# }

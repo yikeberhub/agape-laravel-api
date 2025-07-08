@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
+use Exception;
 
 use App\Helpers\jsonResponse;
 
@@ -43,38 +44,32 @@ class UserController extends Controller
     
         return jsonResponse(true, 'Users fetched successfully.', $users);
     }
-    public function createUser(Request $request)
-    {
-        if (Auth::user()->role !== 'admin') {
-            return jsonResponse(false, 'Unauthorized', null, 403);
-        }
-
-        $validatedData = $request->validate([
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
-            'first_name' => 'required|string|max:255',
-            'role' => 'required|string|in:admin,field_worker',
-            'phone_number' => 'required|string|max:11|unique:users,phone_number',
-        ]);
-
-        try {
-            $user = User::create([
-                'email' => $validatedData['email'],
-                'password' => Hash::make($validatedData['password']),
-                'first_name' => $validatedData['first_name'],
-                'role' => $validatedData['role'],
-                'phone_number' => $validatedData['phone_number'],
-                'is_active' => true,
-            ]);
-
-            return jsonResponse(true, 'User created successfully.', $user, 201);
-        } catch (QueryException $e) {
-            return jsonResponse(false, 'Database error: ' . $e->getMessage(), null, 400);
-        } catch (Exception $e) {
-            return jsonResponse(false, 'An error occurred: ' . $e->getMessage(), null, 500);
-        }
+    public function createUser(RegisterRequest $request)
+{
+    if (Auth::user()->role !== 'admin') {
+        return jsonResponse(false, 'Unauthorized', null, 403);
     }
 
+    try {
+        $validatedData = $request->validated();
+
+        $user = User::create([
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
+            'role' => $validatedData['role'],
+            'phone_number' => $validatedData['phone_number'],
+            'is_active' => true,
+        ]);
+
+        return jsonResponse(true, 'User created successfully.', $user, 201);
+    } catch (QueryException $e) {
+        return jsonResponse(false, 'Database error: ' . $e->getMessage(), null, 400);
+    } catch (Exception $e) {
+        return jsonResponse(false, 'An error occurred: ' . $e->getMessage(), null, 500);
+    }
+}
     public function showUserDetail($id)
     {
         $user = User::find($id);
@@ -105,7 +100,7 @@ class UserController extends Controller
             return jsonResponse(false, 'You are not allowed to perform this action.', null, 403);
         }
 
-        $user->is_active = !$user->is_active; // Toggle active status
+        $user->is_active = !$user->is_active; 
         $user->save();
 
         return jsonResponse(true, $user->is_active ? 'User unblocked successfully.' : 'User blocked successfully.');
@@ -127,24 +122,24 @@ class UserController extends Controller
     public function updatePassword(Request $request, $id)
     {
         $request->validate([
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|min:8',
         ]);
 
         $user = User::findOrFail($id);
         $user->password = Hash::make($request->password);
         $user->save();
 
-        return jsonResponse(true, 'Password updated successfully.');
+        return jsonResponse(true, 'Password updated successfully.',null, 200);
     }
 
     public function filter(Request $request)
     {
         $query = User::query();
-
+    
         if ($request->has('role')) {
-            $query->where('role', 'like', '%' . $request->role . '%');
+            $query->where('role',  $request->role);
         }
-
+    
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -156,9 +151,13 @@ class UserController extends Controller
                   ->orWhere('phone_number', 'like', "%$search%");
             });
         }
-
+    
         $users = $query->paginate(10);
-
+    
+        if ($users->isEmpty()) {
+            return jsonResponse(false, 'No users found.',[],200);
+        }
+    
         return jsonResponse(true, 'Users fetched successfully.', $users);
     }
 }
