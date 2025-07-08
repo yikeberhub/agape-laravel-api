@@ -34,18 +34,32 @@ Route::prefix('users')->middleware('auth:sanctum')->group(function () {
 
 });
 
+
+
 Route::prefix('warrants')->group(function () {
-    Route::get('/', [WarrantController::class, 'index'])->name('warrant.list.create');
-    Route::post('/', [WarrantController::class, 'store'])->name('warrant.store');
-    Route::get('{id}', [WarrantController::class, 'show'])->name('warrant.detail');
+    Route::get('/', [WarrantController::class, 'index'])->name('warrants.index'); // List all warrants
+    Route::get('{id}', [WarrantController::class, 'show'])->name('warrants.show'); // Show a specific warrant
+    Route::post('/', [WarrantController::class, 'store'])->name('warrants.store'); // Create a new warrant
 });
 
-Route::prefix('disability-records')->group(function () {
-    Route::get('/', [DisabilityController::class, 'index'])->name('disability.record.list.create');
-    Route::post('/', [DisabilityController::class, 'store'])->name('disability.record.store');
-    Route::get('{id}', [DisabilityController::class, 'show'])->name('disability.record.detail');
-    Route::get('filter', [DisabilityController::class, 'filter'])->name('disability.record.filter');
-    Route::get('export', [FileExportController::class, 'export'])->name('file.export');
+use App\Http\Controllers\EquipmentController;
+
+Route::prefix('equipment')->group(function () {
+    Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index'); // List all equipment
+    Route::get('{id}', [EquipmentController::class, 'show'])->name('equipment.show'); // Show specific equipment details
+    Route::post('/', [EquipmentController::class, 'store'])->name('equipment.store'); // Create a new equipment
+    Route::put('{id}', [EquipmentController::class, 'update'])->name('equipment.update'); // Update specific equipment
+    Route::delete('{id}', [EquipmentController::class, 'destroy'])->name('equipment.destroy'); // Delete specific equipment
+});
+
+Route::prefix('disabilities')->group(function () {
+    Route::get('/', [DisabilityController::class, 'index'])->name('disabilities.index'); // List all disabilities
+    Route::get('{id}', [DisabilityController::class, 'show'])->name('disabilities.show'); // Show specific disability details
+    Route::post('/', [DisabilityController::class, 'store'])->name('disabilities.store'); // Create a new disability
+    Route::put('{id}', [DisabilityController::class, 'update'])->name('disabilities.update'); // Update a specific disability
+    Route::delete('{id}', [DisabilityController::class, 'destroy'])->name('disabilities.destroy'); // Delete a specific disability
+    Route::get('filter', [DisabilityController::class, 'filter'])->name('disabilities.filter'); // Filter disabilities
+    Route::get('export', [FileExportController::class, 'export'])->name('disabilities.export'); // Export disabilities
 });
 
 Route::get('stats', [StatsController::class, 'index'])->name('stats');
