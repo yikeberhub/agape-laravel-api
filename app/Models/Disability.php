@@ -35,7 +35,7 @@ class Disability extends Model
         'is_deleted',
     ];
 
-    public function user(){
+    public function recorder(){
     return $this->belongsTo(User::class, 'recorder_id');
 }
 

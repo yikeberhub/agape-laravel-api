@@ -1,7 +1,37 @@
-GET  http://localhost:8000/api/disabilities/
+GET  http://localhost:8000/api/disabilities
 Authorization: Bearer 10|PCPLvGBg9BRSuqTh9lPOkMEHDxXMNJRQ7Q4nlYcm598cd36b
 Content-Type: application/json
 
-# {"email":"yikeber50@gmail.com",
-#   "password":"yike12345"
-# }
+{
+    "first_name": "John",
+    "middle_name": "A.",
+    "last_name": "Doe",
+    "gender": "male",
+    "date_of_birth": "1985-05-15",
+    "phone_number": "123-456-7890",
+    "region": "Nairobi",
+    "zone": "Central",
+    "city": "Nairobi City",
+    "woreda": "Woreda 1",
+    "hip_width": 30.5,
+    "backrest_height": 18.0,
+    "thigh_length": 20.0,
+    "profile_image": "url_to_profile_image.jpg",
+    "id_image": "url_to_id_image.jpg",
+    "is_provided": true,
+    "is_active": true,
+    "is_deleted": false,
+    "warrant": {
+        "first_name": "Jane",
+        "middle_name": "B.",
+        "last_name": "Smith",
+        "phone_number": "098-765-4321",
+        "gender": "female",
+        "id_image": "url_to_warrant_image.jpg"
+    },
+    "equipment": {
+        "type": "Wheelchair",
+        "size": "medium",
+        "cause_of_need": "Mobility issues"
+    }
+}

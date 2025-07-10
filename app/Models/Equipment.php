@@ -8,8 +8,9 @@ class Equipment extends Model
 {
     use HasFactory;
 
+    protected $table='equipments';
     protected $fillable = [
-        'equipment_type',
+        'type',
         'size',
         'cause_of_need',
     ];

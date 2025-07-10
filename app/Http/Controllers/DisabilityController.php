@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\DisabilityResource;
 use App\Http\Requests\DisabilityRequest;
-use App\Models\Disability;
 use Illuminate\Support\Facades\Auth;
+
+use App\Models\Equipment;
+use App\Models\Warrant;
+use App\Models\User;
+use App\Models\Disability;
 
 class DisabilityController extends Controller
 {
@@ -34,19 +38,38 @@ class DisabilityController extends Controller
 
     $validated['recorder_id'] = Auth::id();
 
+    $warrantData = $request->warrant;
+    $warrant = Warrant::firstOrCreate(
+        ['phone_number' => $warrantData['phone_number']],
+        [
+            'first_name' => $warrantData['first_name'],
+            'middle_name' => $warrantData['middle_name'],
+            'last_name' => $warrantData['last_name'],
+            'gender' => $warrantData['gender'],
+            'id_image' => $warrantData['id_image'],
+            'is_deleted' => false,
+        ]
+    );
+
+    $validated['warrant_id'] = $warrant->id;
+
+    // Handle the equipment
+    $equipmentData = $request->equipment;
+    $equipment = null;
+
+    if (!empty($equipmentData)) {
+        $equipment = Equipment::firstOrCreate(
+            [
+                'type' => $equipmentData['type'],
+                'size' => $equipmentData['size'],
+                'cause_of_need' => $equipmentData['cause_of_need'],
+            ]
+        );
+
+        $validated['equipment_id'] = $equipment->id;
+    }
+
     $disability = Disability::create($validated);
-
-    if (isset($request->warrant['id'])) {
-        $disability->warrant_id = $request->warrant['id'];
-    }
-
-    // Associate the equipment if provided
-    if (isset($request->equipment['id'])) {
-        $disability->equipment_id = $request->equipment['id'];
-    }
-
-    // Save the updated disability record
-    $disability->save();
 
     return jsonResponse(true, 'Disability created successfully.', new DisabilityResource($disability), 201);
 }
