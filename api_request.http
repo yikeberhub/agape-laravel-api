@@ -1,10 +1,10 @@
-GET  http://localhost:8000/api/disabilities
+PUT  http://localhost:8000/api/disabilities/1
 Authorization: Bearer 10|PCPLvGBg9BRSuqTh9lPOkMEHDxXMNJRQ7Q4nlYcm598cd36b
 Content-Type: application/json
 
 {
-    "first_name": "John",
-    "middle_name": "A.",
+    "first_name": "yike",
+    "middle_name": "man.",
     "last_name": "Doe",
     "gender": "male",
     "date_of_birth": "1985-05-15",

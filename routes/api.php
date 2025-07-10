@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarrantController;
 use App\Http\Controllers\DisabilityController;
+use App\Http\Controllers\EquipmentController;
+
 use App\Http\Controllers\FileExportController;
 use App\Http\Controllers\StatsController;
 
@@ -42,9 +44,8 @@ Route::prefix('warrants')->group(function () {
     Route::post('/', [WarrantController::class, 'store'])->name('warrants.store'); // Create a new warrant
 });
 
-use App\Http\Controllers\EquipmentController;
 
-Route::prefix('equipment')->group(function () {
+Route::prefix('equipment')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index'); // List all equipment
     Route::get('{id}', [EquipmentController::class, 'show'])->name('equipment.show'); // Show specific equipment details
     Route::post('/', [EquipmentController::class, 'store'])->name('equipment.store'); // Create a new equipment
@@ -52,7 +53,7 @@ Route::prefix('equipment')->group(function () {
     Route::delete('{id}', [EquipmentController::class, 'destroy'])->name('equipment.destroy'); // Delete specific equipment
 });
 
-Route::prefix('disabilities')->group(function () {
+Route::prefix('disabilities')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [DisabilityController::class, 'index'])->name('disabilities.index'); // List all disabilities
     Route::get('{id}', [DisabilityController::class, 'show'])->name('disabilities.show'); // Show specific disability details
     Route::post('/', [DisabilityController::class, 'store'])->name('disabilities.store'); // Create a new disability
