@@ -7,11 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class DisabilityResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray($request): array
     {
         return [
@@ -29,8 +24,14 @@ class DisabilityResource extends JsonResource
             'hip_width' => $this->hip_width,
             'backrest_height' => $this->backrest_height,
             'thigh_length' => $this->thigh_length,
-            'profile_image' => $this->profile_image,
-            'id_image' => $this->id_image,
+            'profile_image' => $this->profile_image
+                ? asset('storage/disabilities/profileImages/' . $this->profile_image)
+                : null,
+
+            'id_image' => $this->id_image
+                ? asset('storage/disabilities/idImages/' . $this->id_image)  // ← fixed here
+                : null,
+
             'is_provided' => $this->is_provided,
             'is_active' => $this->is_active,
             'is_deleted' => $this->is_deleted,
