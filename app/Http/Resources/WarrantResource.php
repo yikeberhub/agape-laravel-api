@@ -21,7 +21,7 @@ class WarrantResource extends JsonResource
             'last_name' => $this->last_name,
             'phone_number' => $this->phone_number,
             'gender' => $this->gender,
-            'id_image' => $this->id_image,
+            'id_image' => $this->id_image?asset('storage/warrants/idImages/'.$this->id_image):null,
             'is_deleted' => $this->is_deleted,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
