@@ -33,64 +33,90 @@ class DisabilityController extends Controller
 
    
     public function store(DisabilityRequest $request)
-{
-    $validated = $request->validated();
-
-    $validated['recorder_id'] = Auth::id();
-
-    $warrantData = $request->warrant;
-    $warrant = Warrant::firstOrCreate(
-        ['phone_number' => $warrantData['phone_number']],
-        [
-            'first_name' => $warrantData['first_name'],
-            'middle_name' => $warrantData['middle_name'],
-            'last_name' => $warrantData['last_name'],
-            'gender' => $warrantData['gender'],
-            'id_image' => $warrantData['id_image'],
-            'is_deleted' => false,
-        ]
-    );
-
-    $validated['warrant_id'] = $warrant->id;
-
-    // Handle the equipment
-    $equipmentData = $request->equipment;
-    $equipment = null;
-
-    if (!empty($equipmentData)) {
-        $equipment = Equipment::firstOrCreate(
+    {
+        $validated = $request->validated();
+    
+        $validated['recorder_id'] = Auth::id();
+    
+        $warrantData = $request->warrant;
+    
+        $warrantIdImage = null;
+        if ($request->hasFile('warrant.id_image')) {
+            $warrantIdImage = $request->file('warrant.id_image')->store('warrants/idImages', 'public');
+            $warrantIdImage = basename($warrantIdImage);
+        } elseif (!empty($warrantData['id_image'])) {
+            $warrantIdImage = $warrantData['id_image'];
+        }
+    
+        $warrant = Warrant::firstOrCreate(
+            ['phone_number' => $warrantData['phone_number']],
             [
-                'type' => $equipmentData['type'],
-                'size' => $equipmentData['size'],
-                'cause_of_need' => $equipmentData['cause_of_need'],
+                'first_name' => $warrantData['first_name'],
+                'middle_name' => $warrantData['middle_name'] ?? null,
+                'last_name' => $warrantData['last_name'],
+                'gender' => $warrantData['gender'] ?? null,
+                'id_image' => $warrantIdImage,
+                'is_deleted' => false,
             ]
         );
-
-        $validated['equipment_id'] = $equipment->id;
+    
+        $validated['warrant_id'] = $warrant->id;
+    
+        $equipmentData = $request->equipment;
+        $equipment = null;
+    
+        if (!empty($equipmentData)) {
+            $equipment = Equipment::firstOrCreate(
+                [
+                    'type' => $equipmentData['type'],
+                    'size' => $equipmentData['size'],
+                    'cause_of_need' => $equipmentData['cause_of_need'],
+                ]
+            );
+    
+            $validated['equipment_id'] = $equipment->id;
+        }
+    
+        $disability = Disability::create($validated);
+    
+        return jsonResponse(true, 'Disability created successfully.', new DisabilityResource($disability), 201);
     }
-
-    $disability = Disability::create($validated);
-
-    return jsonResponse(true, 'Disability created successfully.', new DisabilityResource($disability), 201);
-}
+    
 
 public function update(DisabilityRequest $request, $id)
 {
     $disability = Disability::findOrFail($id);
     $validated = $request->validated();
 
+    if ($request->hasFile('profile_image')) {
+        $profileImagePath = $request->file('profile_image')->store('disabilities/profileImages', 'public');
+        $validated['profile_image'] = basename($profileImagePath);
+    }
+
+    if ($request->hasFile('id_image')) {
+        $idImagePath = $request->file('id_image')->store('disabilities/idImages', 'public');
+        $validated['id_image'] = basename($idImagePath);
+    }
+
+    // Handle Warrant
     $warrantData = $request->warrant;
     if (!empty($warrantData)) {
         if (!empty($warrantData['id'])) {
             $warrant = Warrant::findOrFail($warrantData['id']);
-            $warrant->update([
+            $warrantUpdate = [
                 'first_name' => $warrantData['first_name'],
                 'middle_name' => $warrantData['middle_name'] ?? null,
                 'last_name' => $warrantData['last_name'],
                 'phone_number' => $warrantData['phone_number'],
                 'gender' => $warrantData['gender'] ?? null,
-                'id_image' => $warrantData['id_image'] ?? null,
-            ]);
+            ];
+
+            if (isset($warrantData['id_image']) && $request->hasFile('warrant.id_image')) {
+                $warrantIdImagePath = $request->file('warrant.id_image')->store('warrants/idImages', 'public');
+                $warrantUpdate['id_image'] = basename($warrantIdImagePath);
+            }
+
+            $warrant->update($warrantUpdate);
         } else {
             $warrant = Warrant::firstOrCreate(
                 ['phone_number' => $warrantData['phone_number']],
@@ -99,7 +125,9 @@ public function update(DisabilityRequest $request, $id)
                     'middle_name' => $warrantData['middle_name'] ?? null,
                     'last_name' => $warrantData['last_name'],
                     'gender' => $warrantData['gender'] ?? null,
-                    'id_image' => $warrantData['id_image'] ?? null,
+                    'id_image' => $request->hasFile('warrant.id_image')
+                        ? basename($request->file('warrant.id_image')->store('warrants/idImages', 'public'))
+                        : ($warrantData['id_image'] ?? null),
                     'is_deleted' => false,
                 ]
             );
@@ -108,6 +136,7 @@ public function update(DisabilityRequest $request, $id)
         $validated['warrant_id'] = $warrant->id;
     }
 
+    // Handle Equipment
     $equipmentData = $request->equipment;
     if (!empty($equipmentData)) {
         if (!empty($equipmentData['id'])) {
