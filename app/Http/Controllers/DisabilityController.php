@@ -229,4 +229,38 @@ public function filter(Request $request)
 }
 
 
+public function search(Request $request)
+{
+    $query = Disability::query()->with(['warrant', 'recorder', 'equipment']);
+
+    $keyword = $request->input('q');
+
+    if ($keyword) {
+        $query->where(function ($q) use ($keyword) {
+            $q->where('first_name', 'like', "%{$keyword}%")
+              ->orWhere('middle_name', 'like', "%{$keyword}%")
+              ->orWhere('last_name', 'like', "%{$keyword}%")
+              ->orWhere('phone_number', 'like', "%{$keyword}%")
+              ->orWhere('region', 'like', "%{$keyword}%")
+              ->orWhere('city', 'like', "%{$keyword}%")
+              ->orWhereHas('warrant', function ($q2) use ($keyword) {
+                  $q2->where('first_name', 'like', "%{$keyword}%")
+                     ->orWhere('last_name', 'like', "%{$keyword}%");
+              })
+              ->orWhereHas('equipment', function ($q3) use ($keyword) {
+                  $q3->where('type', 'like', "%{$keyword}%")
+                     ->orWhere('cause_of_need', 'like', "%{$keyword}%");
+              });
+        });
+    }
+
+    $perPage = $request->input('per_page', 10);
+    $page = $request->input('page', 1);
+
+    $disabilities = $query->paginate($perPage, ['*'], 'page', $page);
+
+    return jsonResponse(true, 'Disabilities fetched successfully.', $disabilities, 200);
+}
+
+
 }
