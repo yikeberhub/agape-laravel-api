@@ -28,7 +28,6 @@ class DisabilitiesExport implements FromCollection, WithHeadings, WithMapping, W
                 $query->where($field, $value);
             }
         }
-        // dd('data'.$query->get());
         return $query->get();
 
     }
@@ -54,9 +53,11 @@ class DisabilitiesExport implements FromCollection, WithHeadings, WithMapping, W
                 'thigh_length' => $disability->thigh_length,
                 'profile_image' => $disability->profile_image,
                 'id_image' => $disability->id_image,
-                'is_provided' => $disability->is_provided,
-                'is_active' => $disability->is_active,
+                'is_provided' => $disability->is_provided ? 'Yes' : 'No',
+                'is_active' => $disability->is_active ? 'Yes':'No',
                 'is_deleted' => $disability->is_deleted,
+                'created_at'=> $disability->created_at,
+                'updated_at' => $disability->updated_at,
 
                 // Warrant
                 'warrant_first_name' => $disability->warrant->first_name ?? '',
@@ -80,6 +81,7 @@ class DisabilitiesExport implements FromCollection, WithHeadings, WithMapping, W
                 default => '',
             };
         }
+
         return $row;
     }
 
@@ -107,6 +109,8 @@ class DisabilitiesExport implements FromCollection, WithHeadings, WithMapping, W
                 'is_provided' => 'Is Provided',
                 'is_active' => 'Is Active',
                 'is_deleted' => 'Is Deleted',
+                'created_at' => 'Created At',
+                'updated_at'=>'Updated At',
 
                 // Warrant
                 'warrant_first_name' => 'Warrant First Name',
