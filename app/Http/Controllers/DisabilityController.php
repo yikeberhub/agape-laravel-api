@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Http\Resources\DisabilityResource;
 use App\Http\Requests\DisabilityRequest;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
 
 use App\Models\Equipment;
 use App\Models\Warrant;
@@ -173,5 +176,57 @@ public function destroy($id)
 
     return jsonResponse(true, 'Disability deleted successfully.');
 }
+
+public function filter(Request $request)
+{
+    $page = $request->query('page', 1);
+    $perPage = $request->query('per_page', 10);
+    $filters = $request->query();
+
+    $query = Disability::with(['warrant', 'recorder', 'equipment']);
+
+    if (!empty($filters['gender'])) {
+        $query->where('gender', $filters['gender']);
+    }
+
+    if (isset($filters['is_provided'])) {
+        $query->where('is_provided', $filters['is_provided']);
+    }
+
+    if (isset($filters['is_active'])) {
+        $query->where('is_active', $filters['is_active']);
+    }
+
+    if (!empty($filters['year'])) {
+        $query->whereYear('created_at', $filters['year']);
+    }
+
+    if (!empty($filters['min_age']) || !empty($filters['max_age'])) {
+        $today = Carbon::today();
+
+        if (!empty($filters['min_age'])) {
+            $maxDob = $today->copy()->subYears($filters['min_age']);
+            $query->whereDate('date_of_birth', '<=', $maxDob);
+        }
+
+        if (!empty($filters['max_age'])) {
+            $minDob = $today->copy()->subYears($filters['max_age']);
+            $query->whereDate('date_of_birth', '>=', $minDob);
+        }
+    }
+
+    if (!empty($filters['start_date'])) {
+        $query->whereDate('created_at', '>=', $filters['start_date']);
+    }
+
+    if (!empty($filters['end_date'])) {
+        $query->whereDate('created_at', '<=', $filters['end_date']);
+    }
+
+    $disabilities = $query->paginate($perPage, ['*'], 'page', $page);
+
+    return jsonResponse(true, 'Disabilities fetched successfully.', $disabilities, 200);
+}
+
 
 }
