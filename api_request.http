@@ -1,18 +1,21 @@
-PUT  http://localhost:8000/api/disabilities/1
-Authorization: Bearer 10|PCPLvGBg9BRSuqTh9lPOkMEHDxXMNJRQ7Q4nlYcm598cd36b
+
+
+
+GET  http://localhost:8000/api/disabilities/
+Authorization: Bearer 12|QqPet09fiNLzvm4qbDXYhYmGpTLfE0jV6scKqWpBf5942118
 Content-Type: application/json
 
 {
-    "first_name": "yike",
-    "middle_name": "man.",
-    "last_name": "Doe",
+    "first_name": "yikeber",
+    "middle_name": "misganaw.",
+    "last_name": "Zemene",
     "gender": "male",
     "date_of_birth": "1985-05-15",
     "phone_number": "123-456-7890",
-    "region": "Nairobi",
+    "region": "Ethiopia",
     "zone": "Central",
-    "city": "Nairobi City",
-    "woreda": "Woreda 1",
+    "city": "Bahirdar ",
+    "woreda": "Bahirdar 1",
     "hip_width": 30.5,
     "backrest_height": 18.0,
     "thigh_length": 20.0,
@@ -20,13 +23,12 @@ Content-Type: application/json
     "id_image": "url_to_id_image.jpg",
     "is_provided": true,
     "is_active": true,
-    "is_deleted": false,
     "warrant": {
-        "first_name": "Jane",
-        "middle_name": "B.",
-        "last_name": "Smith",
+        "first_name": "Esubalew",
+        "middle_name": "Kunta.",
+        "last_name": "Awash",
         "phone_number": "098-765-4321",
-        "gender": "female",
+        "gender": "male",
         "id_image": "url_to_warrant_image.jpg"
     },
     "equipment": {

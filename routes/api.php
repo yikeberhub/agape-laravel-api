@@ -55,14 +55,16 @@ Route::prefix('equipment')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('disabilities')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [DisabilityController::class, 'index'])->name('disabilities.index'); 
-    Route::get('{id}', [DisabilityController::class, 'show'])->name('disabilities.show'); 
+    Route::get('export', [FileExportController::class, 'export'])->name('disabilities.export');
+
+    Route::get('detail/{id}', [DisabilityController::class, 'show'])->name('disabilities.show'); 
     Route::post('/', [DisabilityController::class, 'store'])->name('disabilities.store'); 
     Route::put('{id}', [DisabilityController::class, 'update'])->name('disabilities.update');
     Route::patch('{id}', [DisabilityController::class, 'update'])->name('disabilities.partial_update'); 
     Route::delete('{id}', [DisabilityController::class, 'destroy'])->name('disabilities.destroy'); 
     Route::get('filter', [DisabilityController::class, 'filter'])->name('disabilities.filter'); 
-    
-    Route::get('export', [FileExportController::class, 'export'])->name('disabilities.export'); 
+
+Route::post('export', [FileExportController::class, 'export'])->name('disabilities.export');
 });
 
 Route::get('stats', [StatsController::class, 'index'])->name('stats');
