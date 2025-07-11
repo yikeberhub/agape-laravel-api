@@ -115,6 +115,9 @@ public function userSearch(Request $request)
             $q->where('first_name', 'like', "%$search%")
               ->orWhere('middle_name', 'like', "%$search%")
               ->orWhere('last_name', 'like', "%$search%")
+              ->orWhere('country', 'like', "%$search%")
+              ->orWhere('region', 'like', "%$search%")
+              ->orWhere('city', 'like', "%$search%")
               ->orWhere('email', 'like', "%$search%")
               ->orWhere('phone_number', 'like', "%$search%");
         });
@@ -122,6 +125,9 @@ public function userSearch(Request $request)
 
     if ($role = $request->input('role')) {
         $query->where('role', $role);
+    }
+    if ($is_blocked = $request->input('is_blocked')) {
+        $query->where('is_blocked', $is_blocked);
     }
 
     if (!is_null($request->input('is_active'))) {
