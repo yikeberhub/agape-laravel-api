@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Password;
 use App\Models\User;
 use App\Mail\EmailVerificationMailable;
@@ -84,6 +85,7 @@ class AuthController extends Controller
     }
 
     $user->email_verified_at = now();
+    $user->is_active = true;
     $user->verification_token = null;
     $user->save();
 
@@ -179,17 +181,21 @@ public function verifyOTP(Request $request)
 
 public function setNewPassword(Request $request)
 {
-    $request->validate([
-        'password' => 'required|string|min:8',
-        'email' => 'required|email',
-    ]);
+    try {
+        $request->validate([
+            'newPassword' => 'required|string|min:8',
+            'email' => 'required|email',
+        ]);
+    } catch (ValidationException $e) {
+        return jsonResponse(false, 'Validation error',null,422, $e->errors());
+    }
 
     $user = User::where('email', $request->email)->first();
     if (!$user) {
         return jsonResponse(false, 'User not found', null, 404);
     }
 
-    $user->password = bcrypt($request->password);
+    $user->password = bcrypt($request->newPassword);
     $user->save();
 
     return jsonResponse(true, 'Password updated successfully', null, 200);
@@ -202,9 +208,6 @@ public function setNewPassword(Request $request)
         return jsonResponse(true,'successfully logged out!',null,200);
     }
 
-    public function currentUserProfile(Request $request)
-    {
-        return jsonResponse(true,'user profile',['user'=>$request->user()],200);
-    }
+    
 }
 

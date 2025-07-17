@@ -19,22 +19,22 @@ Route::prefix('auth')->group(function () {
     Route::post('set-new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');
     Route::middleware('auth:sanctum')->group(function(){
         Route::post('logout',[AuthController::class,'logout'])->name('logout');
-        Route::get('user/profile',[AuthController::class,'currentUserProfile'])->name('logged.in.profile');
     });
 });
 
 
 Route::prefix('users')->middleware('auth:sanctum')->group(function () {
-    Route::get('/', [UserController::class, 'getUsers'])->name('user.list');
-    Route::get('{details/id}', [UserController::class, 'showUserDetail'])->name('user.detail');
-    Route::post('{id}/block', [UserController::class, 'blockUser'])->name('block.user');
-    Route::delete('{id}/delete', [UserController::class, 'deleteUser'])->name('delete.user');
-    Route::post('{id}/update-password', [UserController::class, 'updatePassword'])->name('update.password');
-    Route::post('create', [UserController::class, 'createUser'])->name('user.create');
-    Route::get('blocked', [UserController::class, 'blockedUsers'])->name('blocked.users');
-    Route::get('filter', [UserController::class, 'filter'])->name('user.filter');
-
+    Route::get('/', [UserController::class, 'index'])->name('users.index');
+    Route::get('profile', [AuthController::class, 'currentUserProfile'])->name('users.profile');
+    Route::get('{id}', [UserController::class, 'show'])->name('users.show');
+    Route::post('{id}/block', [UserController::class, 'block'])->name('users.block');
+    Route::delete('{id}/delete', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::patch('{id}/password', [UserController::class, 'updatePassword'])->name('users.updatePassword');
+    Route::post('/', [UserController::class, 'store'])->name('users.store');
+    Route::get('blocked', [UserController::class, 'blocked'])->name('users.blocked');
+    Route::get('filter', [UserController::class, 'filter'])->name('users.filter');
 });
+
 
 
 

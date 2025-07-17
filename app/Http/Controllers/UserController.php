@@ -7,6 +7,8 @@ use App\Http\Requests\RegisterRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Exception;
 
@@ -15,7 +17,7 @@ use App\Helpers\jsonResponse;
 class UserController extends Controller
 {
     
-    public function getUsers(Request $request)
+    public function index(Request $request)
     { 
         if (!Auth::check()) {
             return jsonResponse(false, 'Unauthorized', null, 401);
@@ -44,7 +46,13 @@ class UserController extends Controller
     
         return jsonResponse(true, 'Users fetched successfully.', $users);
     }
-    public function createUser(RegisterRequest $request)
+
+    public function currentUserProfile(Request $request)
+    {
+        return jsonResponse(true,'user profile',['user'=>$request->user()],200);
+    }
+
+    public function store(RegisterRequest $request)
 {
     if (Auth::user()->role !== 'admin') {
         return jsonResponse(false, 'Unauthorized', null, 403);
@@ -70,7 +78,7 @@ class UserController extends Controller
         return jsonResponse(false, 'An error occurred: ' . $e->getMessage(), null, 500);
     }
 }
-    public function showUserDetail($id)
+    public function show($id)
     {
         $user = User::find($id);
 
@@ -85,14 +93,14 @@ class UserController extends Controller
         return jsonResponse(true, 'User details fetched successfully.', $user);
     }
 
-    public function blockedUsers()
+    public function blocked()
     {
         $blockedUsers = User::where('is_active', false)->where('role', 'field_worker')->get();
 
         return jsonResponse(true, 'Blocked users retrieved successfully.', $blockedUsers);
     }
 
-    public function blockUser($id)
+    public function block($id)
     {
         $user = User::findOrFail($id);
 
@@ -106,7 +114,7 @@ class UserController extends Controller
         return jsonResponse(true, $user->is_active ? 'User unblocked successfully.' : 'User blocked successfully.');
     }
 
-    public function deleteUser($id)
+    public function destroy($id)
     {
         $user = User::findOrFail($id);
 
@@ -121,12 +129,19 @@ class UserController extends Controller
 
     public function updatePassword(Request $request, $id)
     {
+        try{
         $request->validate([
-            'password' => 'required|min:8',
+            'newPassword' => 'required|min:8',
         ]);
-
-        $user = User::findOrFail($id);
-        $user->password = Hash::make($request->password);
+    } catch (ValidationException $e) {
+        return jsonResponse(false, 'Validation error',null,422, $e->errors());
+    }
+        try{
+            $user = User::findOrFail($id);
+        } catch (ModelNotFoundException $e) {
+            return jsonResponse(false, 'User not found.', null, 404);
+        }
+        $user->password = Hash::make($request->newPassword);
         $user->save();
 
         return jsonResponse(true, 'Password updated successfully.',null, 200);
