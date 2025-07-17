@@ -11,7 +11,7 @@ use App\Http\Controllers\FileExportController;
 
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->name('user.register');
-    Route::post('email-verify', [AuthController::class, 'verifyEmail'])->name('email.verify');
+    Route::get('email-verify', [AuthController::class, 'verifyEmail'])->name('email.verify');
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('token/refresh', [AuthController::class, 'refreshToken'])->name('token.refresh');
     Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');

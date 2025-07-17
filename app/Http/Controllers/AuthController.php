@@ -40,7 +40,7 @@ class AuthController extends Controller
             ]);
 
             $encodedId = base64_encode($user->id);
-            $app_url = env('APP_URL');
+            $app_url = config('app.url');
             $verificationLink = $app_url . '/api/auth/email-verify?uid=' . $encodedId . '&token=' . $verificationToken;
 
             Mail::to($user->email)->send(new EmailVerificationMailable($verificationLink));
@@ -57,36 +57,38 @@ class AuthController extends Controller
     }
     
 
-    public function verifyEmail(Request $request){
+    public function verifyEmail(Request $request)
+{
     $request->validate([
         'uid' => 'required|string',
         'token' => 'required|string',
     ]);
 
-    $userId = base64_decode($request->input('uid'));
-    $token = $request->input('token');
+    $userId = base64_decode($request->query('uid'));
+    $token = $request->query('token');
 
     $user = User::find($userId);
+
     if (!$user) {
-        return jsonResponse(false, 'User not found', null, 404);
+        return response()->view('auth.verify.failure', ['message' => 'User not found'], 404);
     }
 
     if ($user->email_verified_at) {
-        return jsonResponse(false, 'Email already verified', null, 400);
+        return response()->view('auth.verify.failure', ['message' => 'Email already verified'], 400);
     }
 
     if ($token !== $user->verification_token) {
-        return jsonResponse(false, 'Invalid token', null, 400);
+        return response()->view('auth.verify.failure', ['message' => 'Invalid or expired token'], 400);
     }
 
     $user->email_verified_at = now();
-    $user->verification_token = null; 
+    $user->verification_token = null;
     $user->save();
 
-    return jsonResponse(true, 'Email verified successfully', [
-        'user_id' => $user->id,
-    ]);
+    return view('auth.verify.success');
 }
+
+    
 
 public function login(Request $request)
 {
