@@ -58,7 +58,7 @@ class UserController extends Controller
         return jsonResponse(false, 'Unauthorized', null, 403);
     }
     $request->merge([
-        'password' => $request->input('password', 'password');
+        'password' => $request->input('password', 'password')
     ]);
 
     try {
