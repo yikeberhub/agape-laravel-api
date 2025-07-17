@@ -8,6 +8,7 @@ use App\Http\Requests\DisabilityRequest;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
 
@@ -41,14 +42,16 @@ class DisabilityController extends Controller
     ]);
 }
 
-
-
-    public function show($id)
-    {
+public function show($id)
+{
+    try {
         $disability = Disability::with(['recorder', 'warrant', 'equipment'])->findOrFail($id);
-
-        return jsonResponse(true, 'Disability details fetched successfully.', new DisabilityResource($disability));
+    } catch (ModelNotFoundException $e) {
+        return jsonResponse(false, 'Disability not found.', [], 404);
     }
+
+    return jsonResponse(true, 'Disability details fetched successfully.', new DisabilityResource($disability));
+}
 
    
 public function store(DisabilityRequest $request)
