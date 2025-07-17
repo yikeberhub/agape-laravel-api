@@ -7,6 +7,8 @@ use App\Http\Resources\DisabilityResource;
 use App\Http\Requests\DisabilityRequest;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 
 use App\Models\Equipment;
@@ -23,8 +25,22 @@ class DisabilityController extends Controller
         ->where('is_deleted', false)
         ->paginate(10);
 
-    return jsonResponse(true, 'Disabilities fetched successfully.', DisabilityResource::collection($disabilities));
+    return jsonResponse(true, 'Disabilities fetched successfully.', [
+        'disabilities' => DisabilityResource::collection($disabilities),
+        'pagination' => [
+            'current_page' => $disabilities->currentPage(),
+            'last_page' => $disabilities->lastPage(),
+            'per_page' => $disabilities->perPage(),
+            'total' => $disabilities->total(),
+            'from' => $disabilities->firstItem(),
+            'to' => $disabilities->lastItem(),
+            'next_page_url' => $disabilities->nextPageUrl(),
+            'prev_page_url' => $disabilities->previousPageUrl(),
+        ],
+        
+    ]);
 }
+
 
 
     public function show($id)
@@ -35,14 +51,16 @@ class DisabilityController extends Controller
     }
 
    
-    public function store(DisabilityRequest $request)
-    {
-        $validated = $request->validated();
-    
-        $validated['recorder_id'] = Auth::id();
-    
+public function store(DisabilityRequest $request)
+{
+    $validated = $request->validated();
+    $validated['recorder_id'] = Auth::id();
+
+    $disability = null;
+
+    DB::transaction(function () use (&$disability, $validated, $request) {
         $warrantData = $request->warrant;
-    
+
         $warrantIdImage = null;
         if ($request->hasFile('warrant.id_image')) {
             $warrantIdImage = $request->file('warrant.id_image')->store('warrants/idImages', 'public');
@@ -50,7 +68,7 @@ class DisabilityController extends Controller
         } elseif (!empty($warrantData['id_image'])) {
             $warrantIdImage = $warrantData['id_image'];
         }
-    
+
         $warrant = Warrant::firstOrCreate(
             ['phone_number' => $warrantData['phone_number']],
             [
@@ -62,12 +80,12 @@ class DisabilityController extends Controller
                 'is_deleted' => false,
             ]
         );
-    
+
         $validated['warrant_id'] = $warrant->id;
-    
+
         $equipmentData = $request->equipment;
         $equipment = null;
-    
+
         if (!empty($equipmentData)) {
             $equipment = Equipment::firstOrCreate(
                 [
@@ -76,14 +94,16 @@ class DisabilityController extends Controller
                     'cause_of_need' => $equipmentData['cause_of_need'],
                 ]
             );
-    
+
             $validated['equipment_id'] = $equipment->id;
         }
-    
+
         $disability = Disability::create($validated);
-    
-        return jsonResponse(true, 'Disability created successfully.', new DisabilityResource($disability), 201);
-    }
+    });
+
+    return jsonResponse(true, 'Disability created successfully.', new DisabilityResource($disability), 201);
+}
+
     
 
 public function update(DisabilityRequest $request, $id)
