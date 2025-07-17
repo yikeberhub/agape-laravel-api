@@ -177,23 +177,24 @@ public function verifyOTP(Request $request)
     return jsonResponse(true, 'OTP verified successfully', null, 200);
 }
 
-    public function setNewPassword(Request $request)
-    {
-        $request->validate([
-            'password'=>'reqired|string|min:8|',
-            'email'=>'required|email',
-        ]);
+public function setNewPassword(Request $request)
+{
+    $request->validate([
+        'password' => 'required|string|min:8',
+        'email' => 'required|email',
+    ]);
 
-        $user = User::where('email',$request->email)->first();
-        if(!$user){
-            return jsonResponse(false,'User not found',null,404);
-
-            $user->password=bcrypt($request->password);
-            $user->save();
-        }
-        return jsonResponse(true,'Password updated successfully',null,200);
-
+    $user = User::where('email', $request->email)->first();
+    if (!$user) {
+        return jsonResponse(false, 'User not found', null, 404);
     }
+
+    $user->password = bcrypt($request->password);
+    $user->save();
+
+    return jsonResponse(true, 'Password updated successfully', null, 200);
+}
+
 
     public function logout(Request $request)
     {
