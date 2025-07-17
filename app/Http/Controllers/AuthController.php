@@ -124,10 +124,14 @@ public function login(Request $request)
             'email' => 'required|email',
             'phone_number' => 'required|string',
         ]);
-    
-        $user = User::where('email', $request->email)
-                    ->orWhere('phone_number', $request->phone_number)
-                    ->first();
+       
+        
+        if($request->email){
+         $user = User::where('email', $request->email)->first();
+        } 
+        elseif ($request->phone_number) {
+            $user = User::where('phone_number', $request->phone_number)->first();
+        } 
     
         if (!$user) {
             return response()->json(['message' => 'User not found.'], 404);
@@ -136,8 +140,9 @@ public function login(Request $request)
         $otp = rand(100000, 999999);
     
         Mail::to($user->email)->send(new ResetOtpMailable($otp,$user->first_name));
+        $type=$request->phone_number?'phone number':'email';
     
-        return jsonResponse(true, 'OTP sent successfully', [
+        return jsonResponse(true, 'OTP sent successfully to your'.$type.'please look at your '.$type, [
             'user_id'=>$user->id,
         ],200);
     }
