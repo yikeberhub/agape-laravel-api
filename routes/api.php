@@ -26,14 +26,15 @@ Route::prefix('auth')->group(function () {
 Route::prefix('users')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('users.index');
     Route::get('profile', [AuthController::class, 'currentUserProfile'])->name('users.profile');
-    Route::get('{id}', [UserController::class, 'show'])->name('users.show');
+    Route::get('blocked', [UserController::class, 'blocked'])->name('users.blocked');
+    Route::get('filter', [UserController::class, 'filter'])->name('users.filter');
+    Route::post('/', [UserController::class, 'store'])->name('users.store');
     Route::post('{id}/block', [UserController::class, 'block'])->name('users.block');
     Route::delete('{id}/delete', [UserController::class, 'destroy'])->name('users.destroy');
     Route::patch('{id}/password', [UserController::class, 'updatePassword'])->name('users.updatePassword');
-    Route::post('/', [UserController::class, 'store'])->name('users.store');
-    Route::get('blocked', [UserController::class, 'blocked'])->name('users.blocked');
-    Route::get('filter', [UserController::class, 'filter'])->name('users.filter');
+    Route::get('{id}', [UserController::class, 'show'])->name('users.show'); 
 });
+
 
 
 

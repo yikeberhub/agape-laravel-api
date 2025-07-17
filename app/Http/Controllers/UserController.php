@@ -99,11 +99,11 @@ class UserController extends Controller
     }
 
     public function blocked()
-    {
-        $blockedUsers = User::where('is_active', false)->where('role', 'field_worker')->get();
+{
+    $blockedUsers = User::where('is_active', false)->get();
 
-        return jsonResponse(true, 'Blocked users retrieved successfully.', $blockedUsers);
-    }
+    return jsonResponse(true, 'Blocked users retrieved successfully.', $blockedUsers);
+}
 
     public function block($id)
     {
