@@ -13,15 +13,19 @@ class ResetOtpMailable extends Mailable
     public $otp;
     public $name;
 
-    public function __construct($otp,$name)
+    public function __construct($otp, $name)
     {
         $this->otp = $otp;
-        $this->name=$name;
+        $this->name = $name;
     }
 
     public function build()
     {
-        return $this->view('resetOtpEmail')
-                    ->with(['otp' => $this->otp,'name'=>$this->name]);
+        return $this->subject('OTP Verification')
+                    ->view('resetOtpEmail')
+                    ->with([
+                        'otp' => $this->otp,
+                        'name' => $this->name,
+                    ]);
     }
 }

@@ -3,14 +3,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Password;
+use App\Models\User;
 use App\Mail\EmailVerificationMailable;
 use App\Mail\ResetOtpMailable;
+use App\Models\UserOtp;
 
 
 use App\Http\Requests\RegisterRequest;
@@ -119,46 +121,61 @@ public function login(Request $request)
     }
 
     public function resetPassword(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'phone_number' => 'required|string',
-        ]);
-       
-        
-        if($request->email){
-         $user = User::where('email', $request->email)->first();
-        } 
-        elseif ($request->phone_number) {
-            $user = User::where('phone_number', $request->phone_number)->first();
-        } 
-    
-        if (!$user) {
-            return response()->json(['message' => 'User not found.'], 404);
-        }
-    
-        $otp = rand(100000, 999999);
-    
-        Mail::to($user->email)->send(new ResetOtpMailable($otp,$user->first_name));
-        $type=$request->phone_number?'phone number':'email';
-    
-        return jsonResponse(true, 'OTP sent successfully to your'.$type.'please look at your '.$type, [
-            'user_id'=>$user->id,
-        ],200);
+{
+    $request->validate([
+        'email' => 'nullable|email',
+        'phone_number' => 'nullable|string',
+    ]);
+
+    $user = null;
+    if($request->email){
+        $user = User::where('email', $request->email)->first();
+    } elseif ($request->phone_number) {
+        $user = User::where('phone_number', $request->phone_number)->first();
     }
 
-    public function verifyOTP(Request $request)
-    {
-        $request->validate([
-            'otp'=>'required|numeric',
-        ]);
-        $correctedOtp = 1234;
-
-        if($request->otp==$correctedOtp){
-            return jsonResponse(true,'otp verified successfully',null,200);
-        }
-        return jsonResponse(false,'Invalid otp',null,400);
+    if (!$user) {
+        return response()->json(['message' => 'User not found.'], 404);
     }
+
+    $otp = rand(100000, 999999);
+    
+    UserOtp::create([
+        'user_id' => $user->id,
+        'otp' => $otp,
+        'expires_at' => Carbon::now()->addMinutes(5),
+    ]);
+
+    // Send OTP via email (or SMS)
+    Mail::to($user->email)->send(new ResetOtpMailable($otp, $user->first_name));
+    $type = $request->phone_number ? 'phone number' : 'email';
+
+    return jsonResponse(true, 'OTP sent to your '.$type, [
+        'user_id' => $user->id,
+    ], 200);
+}
+
+public function verifyOTP(Request $request)
+{
+    $request->validate([
+        'user_id' => 'required|integer',
+        'otp' => 'required|numeric',
+    ]);
+
+    $userOtp = UserOtp::where('user_id', $request->user_id)
+                      ->where('otp', $request->otp)
+                      ->where('expires_at', '>', Carbon::now())
+                      ->latest()
+                      ->first();
+
+    if (!$userOtp) {
+        return jsonResponse(false, 'Invalid or expired OTP', null, 400);
+    }
+
+    $userOtp->delete();
+
+    return jsonResponse(true, 'OTP verified successfully', null, 200);
+}
 
     public function setNewPassword(Request $request)
     {
