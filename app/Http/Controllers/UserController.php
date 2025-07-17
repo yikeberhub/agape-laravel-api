@@ -57,8 +57,12 @@ class UserController extends Controller
     if (Auth::user()->role !== 'admin') {
         return jsonResponse(false, 'Unauthorized', null, 403);
     }
+    $request->merge([
+        'password' => $request->input('password', 'password');
+    ]);
 
     try {
+        
         $validatedData = $request->validated();
 
         $user = User::create([
@@ -66,6 +70,7 @@ class UserController extends Controller
             'password' => Hash::make($validatedData['password']),
             'first_name' => $validatedData['first_name'],
             'last_name' => $validatedData['last_name'],
+            'password' => Hash::make($validatedData['password']),
             'role' => $validatedData['role'],
             'phone_number' => $validatedData['phone_number'],
             'is_active' => true,
