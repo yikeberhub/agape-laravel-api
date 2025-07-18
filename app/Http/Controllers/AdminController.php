@@ -48,11 +48,13 @@ class AdminController extends Controller
 
         $top_regions = $region_data->sortByDesc('count')->take(3)->values();
 
-        // ✅ FIXED: Use correct table name 'equipments' instead of 'equipment'
-        $equipment_distribution = Disability::join('equipments as e', 'disabilities.equipment_id', '=', 'e.id')
-            ->select('e.type', DB::raw('count(*) as count'))
-            ->groupBy('e.type')
+        $equipment_distribution = DB::table('disabilities')
+            ->join('equipments', 'disabilities.equipment_id', '=', 'equipments.id')
+            ->join('equipment_types', 'equipments.type_id', '=', 'equipment_types.id')
+            ->select('equipment_types.name as type', DB::raw('count(*) as count'))
+            ->groupBy('equipment_types.name')
             ->get();
+
 
         $top_recorders = Disability::select('recorder_id', DB::raw('count(*) as count'))
             ->groupBy('recorder_id')
