@@ -246,10 +246,25 @@ public function filter(Request $request)
         $query->whereDate('created_at', '<=', $filters['end_date']);
     }
 
+    // Get paginated results
     $disabilities = $query->paginate($perPage, ['*'], 'page', $page);
 
-    return jsonResponse(true, 'Disabilities fetched successfully.', $disabilities, 200);
+    // Custom response format
+    return jsonResponse(true, 'Disabilities fetched successfully.', [
+        'disabilities' => DisabilityResource::collection($disabilities),
+        'pagination' => [
+            'current_page' => $disabilities->currentPage(),
+            'last_page' => $disabilities->lastPage(),
+            'per_page' => $disabilities->perPage(),
+            'total' => $disabilities->total(),
+            'from' => $disabilities->firstItem(),
+            'to' => $disabilities->lastItem(),
+            'next_page_url' => $disabilities->nextPageUrl(),
+            'prev_page_url' => $disabilities->previousPageUrl(),
+        ],
+    ]);
 }
+
 
 
 public function search(Request $request)
@@ -264,6 +279,7 @@ public function search(Request $request)
               ->orWhere('middle_name', 'like', "%{$keyword}%")
               ->orWhere('last_name', 'like', "%{$keyword}%")
               ->orWhere('phone_number', 'like', "%{$keyword}%")
+              ->orWhere('gender',$keyword)
               ->orWhere('region', 'like', "%{$keyword}%")
               ->orWhere('city', 'like', "%{$keyword}%")
               ->orWhereHas('warrant', function ($q2) use ($keyword) {
@@ -282,8 +298,21 @@ public function search(Request $request)
 
     $disabilities = $query->paginate($perPage, ['*'], 'page', $page);
 
-    return jsonResponse(true, 'Disabilities fetched successfully.', $disabilities, 200);
+    return jsonResponse(true, 'Disabilities fetched successfully.', [
+        'disabilities' => DisabilityResource::collection($disabilities),
+        'pagination' => [
+            'current_page' => $disabilities->currentPage(),
+            'last_page' => $disabilities->lastPage(),
+            'per_page' => $disabilities->perPage(),
+            'total' => $disabilities->total(),
+            'from' => $disabilities->firstItem(),
+            'to' => $disabilities->lastItem(),
+            'next_page_url' => $disabilities->nextPageUrl(),
+            'prev_page_url' => $disabilities->previousPageUrl(),
+        ],
+    ]);
 }
+
 
 
 }
