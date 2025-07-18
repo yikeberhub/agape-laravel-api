@@ -17,9 +17,6 @@ class EquipmentSubTypeResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'equipment_type_id' => $this->equipment_type_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

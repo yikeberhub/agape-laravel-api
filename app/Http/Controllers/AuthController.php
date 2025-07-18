@@ -22,12 +22,11 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request) // Use RegisterRequest here
+    public function register(RegisterRequest $request)
     {
         if ($request->user() && $request->user()->role != 'admin') {
             return jsonResponse(false, 'Unauthorized', null, 403);
         }
-
         try {
             $verificationToken = Str::random(60);
             $user = User::create([

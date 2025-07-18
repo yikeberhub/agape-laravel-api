@@ -5,6 +5,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarrantController;
 use App\Http\Controllers\DisabilityController;
 use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\EquipmentTypeController;
+use App\Http\Controllers\EquipmentSubTypeController;
+
 use App\Http\Controllers\AdminController;
 
 use App\Http\Controllers\FileExportController;
@@ -44,6 +47,7 @@ Route::prefix('warrants')->group(function () {
 });
 
 
+// Equipment routes
 Route::prefix('equipment')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index'); 
     Route::get('{id}', [EquipmentController::class, 'show'])->name('equipment.show'); 
@@ -51,6 +55,8 @@ Route::prefix('equipment')->middleware('auth:sanctum')->group(function () {
     Route::put('{id}', [EquipmentController::class, 'update'])->name('equipment.update');
     Route::delete('{id}', [EquipmentController::class, 'destroy'])->name('equipment.destroy');
 });
+
+
 
 Route::prefix('disabilities')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [DisabilityController::class, 'index'])->name('disabilities.index');
@@ -68,4 +74,19 @@ Route::prefix('disabilities')->middleware('auth:sanctum')->group(function () {
 Route::prefix('admin')->middleware('auth:sanctum')->group(function(){
  Route::get('stats', [AdminController::class, 'stat'])->name('admin.stat');
  Route::get('users/search', [AdminController::class, 'userSearch'])->name('admin.user.search');
+ Route::prefix('equipment-type')->group(function () {
+    Route::get('/', [EquipmentTypeController::class, 'index']);
+    Route::get('{id}', [EquipmentTypeController::class, 'show']);
+    Route::post('/', [EquipmentTypeController::class, 'store']);
+    Route::put('{id}', [EquipmentTypeController::class, 'update']);
+    Route::delete('{id}', [EquipmentTypeController::class, 'destroy']);
+
+    Route::get('{equipmentTypeId}/sub-type', [EquipmentSubTypeController::class, 'index']);
+    Route::post('{equipmentTypeId}/sub-type', [EquipmentSubTypeController::class, 'store']);
+    Route::get('{equipmentTypeId}/sub-type/{subTypeId}', [EquipmentSubTypeController::class, 'show']);
+    Route::put('{equipmentTypeId}/sub-type/{subTypeId}', [EquipmentSubTypeController::class, 'update']);
+    Route::delete('{equipmentTypeId}/sub-type/{subTypeId}', [EquipmentSubTypeController::class, 'destroy']);
 });
+});
+
+

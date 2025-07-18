@@ -24,11 +24,12 @@ return new class extends Migration
             $table->enum('gender', ['male', 'female'])->nullable();
             $table->string('phone_number')->nullable()->unique();
             $table->string('profile_image')->nullable();
-            $table->enum('role',['admin','field_worker'])->default('field_worker');
+            $table->enum('role', ['admin', 'field_worker'])->default('field_worker');
             $table->boolean('is_active')->default(false);
             $table->boolean('is_deleted')->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
+            $table->softDeletes(); // 👈 Adds deleted_at column
             $table->timestamps();
         });
     }

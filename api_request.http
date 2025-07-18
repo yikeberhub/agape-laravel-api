@@ -1,39 +1,51 @@
 
 
-
-GET  http://localhost:8000/api/disabilities/
-Authorization: Bearer 12|QqPet09fiNLzvm4qbDXYhYmGpTLfE0jV6scKqWpBf5942118
+POST http://localhost:8000/api/auth/register
 Content-Type: application/json
 
 {
-    "first_name": "yikeber",
-    "middle_name": "misganaw.",
-    "last_name": "Zemene",
-    "gender": "male",
-    "date_of_birth": "1985-05-15",
-    "phone_number": "123-456-7890",
-    "region": "Ethiopia",
-    "zone": "Central",
-    "city": "Bahirdar ",
-    "woreda": "Bahirdar 1",
-    "hip_width": 30.5,
-    "backrest_height": 18.0,
-    "thigh_length": 20.0,
-    "profile_image": "url_to_profile_image.jpg",
-    "id_image": "url_to_id_image.jpg",
-    "is_provided": true,
-    "is_active": true,
-    "warrant": {
-        "first_name": "Esubalew",
-        "middle_name": "Kunta.",
-        "last_name": "Awash",
-        "phone_number": "098-765-4321",
-        "gender": "male",
-        "id_image": "url_to_warrant_image.jpg"
-    },
-    "equipment": {
-        "type": "Wheelchair",
-        "size": "medium",
-        "cause_of_need": "Mobility issues"
-    }
+  "email": "yikeber50@gmail.com",
+  "first_name": "yikeber",
+  "last_name": "misganaw",
+  "password": "yike1234",
+  "role": "admin",
+  "gender": "male",
+  "phone_number": "0946472687"
 }
+
+
+
+
+
+# {
+#     "first_name": "yikeber",
+#     "middle_name": "misganaw.",
+#     "last_name": "Zemene",
+#     "gender": "male",
+#     "date_of_birth": "1985-05-15",
+#     "phone_number": "123-456-7890",
+#     "region": "Ethiopia",
+#     "zone": "Central",
+#     "city": "Bahirdar ",
+#     "woreda": "Bahirdar 1",
+#     "hip_width": 30.5,
+#     "backrest_height": 18.0,
+#     "thigh_length": 20.0,
+#     "profile_image": "url_to_profile_image.jpg",
+#     "id_image": "url_to_id_image.jpg",
+#     "is_provided": true,
+#     "is_active": true,
+#     "warrant": {
+#         "first_name": "Esubalew",
+#         "middle_name": "Kunta.",
+#         "last_name": "Awash",
+#         "phone_number": "098-765-4321",
+#         "gender": "male",
+#         "id_image": "url_to_warrant_image.jpg"
+#     },
+#     "equipment": {
+#         "type": "Wheelchair",
+#         "size": "medium",
+#         "cause_of_need": "Mobility issues"
+#     }
+# }
