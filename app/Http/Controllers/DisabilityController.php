@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Resources\DisabilityResource;
-use App\Http\Requests\DisabilityRequest;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 
+use App\Http\Resources\DisabilityResource;
+use App\Http\Requests\DisabilityRequest;
 use App\Models\Equipment;
 use App\Models\Warrant;
 use App\Models\User;
@@ -20,7 +20,7 @@ class DisabilityController extends Controller
 {
     public function index()
     {
-        $disabilities = Disability::with(['recorder', 'warrant', 'equipment'])
+        $disabilities = Disability::with(['recorder', 'warrant', 'equipment','equipment.type','equipment.subType'])
             ->where('is_deleted', false)
             ->paginate(10);
 
@@ -42,7 +42,7 @@ class DisabilityController extends Controller
     public function show($id)
     {
         try {
-            $disability = Disability::with(['recorder', 'warrant', 'equipment'])->findOrFail($id);
+            $disability = Disability::with(['recorder', 'warrant', 'equipment','equipment.type','equipment.subType'])->findOrFail($id);
             return jsonResponse(true, 'Disability details fetched successfully.', new DisabilityResource($disability));
         } catch (ModelNotFoundException $e) {
             return jsonResponse(false, 'Disability not found.', [], 404);
@@ -85,8 +85,8 @@ class DisabilityController extends Controller
                 if (!empty($equipmentData)) {
                     $equipment = Equipment::firstOrCreate(
                         [
-                            'equipment_type_id' => $equipmentData['equipment_type_id'],
-                            'equipment_sub_type_id' => $equipmentData['equipment_sub_type_id'],
+                            'type_id' => $equipmentData['type_id'],
+                            'sub_type_id' => $equipmentData['sub_type_id'],
                             'size' => $equipmentData['size'],
                             'cause_of_need' => $equipmentData['cause_of_need'],
                         ]
@@ -159,15 +159,16 @@ class DisabilityController extends Controller
                 if (!empty($equipmentData['id'])) {
                     $equipment = Equipment::findOrFail($equipmentData['id']);
                     $equipment->update([
-                        'type' => $equipmentData['type'],
-                        'sub_type' => $equipmentData['sub_type'],
+                        'type_id' => $equipmentData['type_id'],
+                        'sub_type_id' => $equipmentData['sub_type_id'],
                         'size' => $equipmentData['size'],
                         'cause_of_need' => $equipmentData['cause_of_need'],
                     ]);
                 } else {
                     $equipment = Equipment::firstOrCreate(
                         [
-                            'type' => $equipmentData['type'],
+                            'type_id' => $equipmentData['type_id'],
+                            'sub_type_id' => $equipmentData['sub_type_id'],
                             'size' => $equipmentData['size'],
                             'cause_of_need' => $equipmentData['cause_of_need'],
                         ]
@@ -207,7 +208,7 @@ class DisabilityController extends Controller
         $perPage = $request->query('per_page', 10);
         $filters = $request->query();
 
-        $query = Disability::with(['warrant', 'recorder', 'equipment']);
+        $query = Disability::with(['warrant', 'recorder', 'equipment','equipment.type','equipment.subType']);
 
         if (!empty($filters['gender'])) {
             $query->where('gender', $filters['gender']);
@@ -266,7 +267,7 @@ class DisabilityController extends Controller
 
     public function search(Request $request)
     {
-        $query = Disability::query()->with(['warrant', 'recorder', 'equipment']);
+        $query = Disability::query()->with(['warrant', 'recorder', 'equipment','equipment.type','equipment.subType']);
 
         $keyword = $request->input('q');
 
@@ -283,10 +284,10 @@ class DisabilityController extends Controller
                         $q2->where('first_name', 'like', "%{$keyword}%")
                             ->orWhere('last_name', 'like', "%{$keyword}%");
                     })
-                    ->orWhereHas('equipment', function ($q3) use ($keyword) {
-                        $q3->where('type', 'like', "%{$keyword}%")
-                            ->orWhere('cause_of_need', 'like', "%{$keyword}%");
+                    ->orWhereHas('equipment.type', function ($q4) use ($keyword) {
+                        $q4->where('name', 'like', "%{$keyword}%");
                     });
+                    
             });
         }
 

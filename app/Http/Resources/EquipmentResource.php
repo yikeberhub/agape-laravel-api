@@ -18,11 +18,10 @@ class EquipmentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'type' => $this->type,
             'size' => $this->size,
             'cause_of_need' => $this->cause_of_need,
-            'type' => new EquipmentTypeResource($this->whenLoaded('equipmentType')),
-            'sub_type' => new EquipmentSubTypeResource($this->whenLoaded('equipmentSubType')),
+            'type' => new EquipmentTypeResource($this->whenLoaded('type')),
+            'sub_type' => new EquipmentSubTypeResource($this->whenLoaded('subType')),
             // 'created_at' => $this->created_at,
             // 'updated_at' => $this->updated_at,
         ];

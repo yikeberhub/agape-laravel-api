@@ -136,7 +136,7 @@ class UserController extends Controller
     {
         try{
         $request->validate([
-            'newPassword' => 'required|min:8',
+            'new_password' => 'required|min:8',
         ]);
     } catch (ValidationException $e) {
         return jsonResponse(false, 'Validation error',null,422, $e->errors());
@@ -146,7 +146,7 @@ class UserController extends Controller
         } catch (ModelNotFoundException $e) {
             return jsonResponse(false, 'User not found.', null, 404);
         }
-        $user->password = Hash::make($request->newPassword);
+        $user->password = Hash::make($request->new_password);
         $user->save();
 
         return jsonResponse(true, 'Password updated successfully.',null, 200);

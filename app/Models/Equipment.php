@@ -15,19 +15,18 @@ class Equipment extends Model
     protected $table = 'equipments';
 
     protected $fillable = [
-        'type',
         'size',
         'cause_of_need',
         'type_id',
         'sub_type_id',
     ];
 
-    public function equipmentType()
+    public function type()
     {
         return $this->belongsTo(EquipmentType::class);
     }
 
-    public function equipmentSubType()
+    public function subType()
     {
         return $this->belongsTo(EquipmentSubType::class);
     }
