@@ -14,11 +14,11 @@ class CreateEquipmentsTable extends Migration
             $table->string('size')->nullable();
             $table->text('cause_of_need')->nullable();
 
-            $table->foreignId('equipment_type_id')
+            $table->foreignId('type_id')
                   ->constrained('equipment_types')
                   ->onDelete('restrict');
 
-            $table->foreignId('equipment_sub_type_id')
+            $table->foreignId('sub_type_id')
                   ->nullable()
                   ->constrained('equipment_sub_types')
                   ->onDelete('set null');

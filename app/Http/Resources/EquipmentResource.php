@@ -21,10 +21,10 @@ class EquipmentResource extends JsonResource
             'type' => $this->type,
             'size' => $this->size,
             'cause_of_need' => $this->cause_of_need,
-            'equipment_type' => new EquipmentTypeResource($this->whenLoaded('equipmentType')),
-            'equipment_sub_type' => new EquipmentSubTypeResource($this->whenLoaded('equipmentSubType')),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'type' => new EquipmentTypeResource($this->whenLoaded('equipmentType')),
+            'sub_type' => new EquipmentSubTypeResource($this->whenLoaded('equipmentSubType')),
+            // 'created_at' => $this->created_at,
+            // 'updated_at' => $this->updated_at,
         ];
     }
 }

@@ -18,8 +18,8 @@ class Equipment extends Model
         'type',
         'size',
         'cause_of_need',
-        'equipment_type_id',
-        'equipment_sub_type_id',
+        'type_id',
+        'sub_type_id',
     ];
 
     public function equipmentType()

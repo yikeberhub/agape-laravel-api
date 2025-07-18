@@ -59,7 +59,7 @@ class EquipmentTypeController extends Controller
             ]);
 
             $type->update($validated);
-            return jsonResponse(true, 'Equipment type updated successfully', $type);
+            return jsonResponse(true, 'Equipment type updated successfully', new EquipmentTypeResource($type));
         } catch (ModelNotFoundException $e) {
             return jsonResponse(false, 'Equipment type not found', null, 404);
         } catch (ValidationException $e) {

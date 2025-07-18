@@ -55,7 +55,8 @@ class DisabilityRequest extends FormRequest
             'warrant.gender' => 'nullable|in:male,female',
             'warrant.id_image' => 'nullable|string',
 
-            'equipment.type' => "$req|string|max:255",
+            'equipment.equipment_type_id' => "$req|string|max:255",
+            'equipment.equipment_sub_type_id' => "$req|string|max:255",
             'equipment.size' => "$req|string|max:50",
             'equipment.cause_of_need' => "$req|string|max:255",
         ];
