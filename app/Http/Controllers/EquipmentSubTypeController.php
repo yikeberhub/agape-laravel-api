@@ -90,7 +90,7 @@ class EquipmentSubTypeController extends Controller
 
             $subType->delete();
 
-            return jsonResponse(true, 'Sub type deleted successfully');
+            return jsonResponse(true, 'Sub type deleted successfully',null,204);
         } catch (ModelNotFoundException $e) {
             return jsonResponse(false, 'Sub type not found', null, 404);
         } catch (\Exception $e) {
