@@ -16,7 +16,7 @@ class CreateEquipmentsTable extends Migration
 
             $table->foreignId('type_id')
                   ->constrained('equipment_types')
-                  ->onDelete('restrict');
+                  ->onDelete('set null');
 
             $table->foreignId('sub_type_id')
                   ->nullable()
