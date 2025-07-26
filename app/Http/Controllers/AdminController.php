@@ -8,7 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Helpers\jsonResponse;
+use App\Http\Resources\UserResource;
 
 class AdminController extends Controller
 {
@@ -139,7 +139,19 @@ public function userSearch(Request $request)
     $perPage = $request->input('per_page', 10);
     $users = $query->paginate($perPage);
 
-    return jsonResponse(true, 'Users fetched successfully.', $users);
-}
+    return jsonResponse(true, 'Users fetched successfully.', [
+        'users' => UserResource::collection($users),
+        'pagination' => [
+            'current_page' => $users->currentPage(),
+            'last_page' => $users->lastPage(),
+            'per_page' => $users->perPage(),
+            'total' => $users->total(),
+            'from' => $users->firstItem(),
+            'to' => $users->lastItem(),
+            'next_page_url' => $users->nextPageUrl(),
+            'prev_page_url' => $users->previousPageUrl(),
+        ],
+    ]);
+    }
 
 }
