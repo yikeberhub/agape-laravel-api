@@ -47,7 +47,6 @@ Route::prefix('warrants')->group(function () {
 });
 
 
-// Equipment routes
 Route::prefix('equipment')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index'); 
     Route::get('{id}', [EquipmentController::class, 'show'])->name('equipment.show'); 
@@ -63,7 +62,7 @@ Route::prefix('disabilities')->middleware('auth:sanctum')->group(function () {
     Route::post('/', [DisabilityController::class, 'store'])->name('disabilities.store'); 
     Route::get('filter', [DisabilityController::class, 'filter'])->name('disabilities.filter'); 
     Route::get('search', [DisabilityController::class, 'search'])->name('disabilities.search');
-    Route::post('export', [FileExportController::class, 'export'])->name('disabilities.export');
+    // Route::post('export', [FileExportController::class, 'export'])->name('disabilities.export');
     Route::get('{id}', [DisabilityController::class, 'show'])->name('disabilities.show'); 
     Route::put('{id}', [DisabilityController::class, 'update'])->name('disabilities.update');
     Route::patch('{id}', [DisabilityController::class, 'update'])->name('disabilities.partial_update'); 
@@ -74,6 +73,7 @@ Route::prefix('disabilities')->middleware('auth:sanctum')->group(function () {
 Route::prefix('admin')->middleware('auth:sanctum')->group(function(){
  Route::get('stats', [AdminController::class, 'stat'])->name('admin.stat');
  Route::get('users/search', [AdminController::class, 'userSearch'])->name('admin.user.search');
+ Route::post('disabilities/export', [FileExportController::class, 'export'])->name('disabilities.export');
  Route::prefix('equipment-type')->group(function () {
     Route::get('/', [EquipmentTypeController::class, 'index']);
     Route::get('{id}', [EquipmentTypeController::class, 'show']);

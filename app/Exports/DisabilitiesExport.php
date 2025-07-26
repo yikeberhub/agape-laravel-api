@@ -21,7 +21,7 @@ class DisabilitiesExport implements FromCollection, WithHeadings, WithMapping, W
 
     public function collection()
     {
-        $query = Disability::with(['warrant', 'recorder', 'equipment']);
+        $query = Disability::with(['warrant', 'recorder', 'equipment','equipment.type','equipment.subType']);
 
         if (!empty($this->filters)) {
             foreach ($this->filters as $field => $value) {
@@ -74,7 +74,8 @@ class DisabilitiesExport implements FromCollection, WithHeadings, WithMapping, W
                 'recorder_phone_number' => $disability->recorder->phone_number ?? '',
 
                 // Equipment
-                'equipment_type' => $disability->equipment->type ?? '',
+                'equipment_type' => $disability->equipment->type->name ?? '',
+                'equipment_subType' => $disability->equipment->subType->name ?? '',
                 'equipment_size' => $disability->equipment->size ?? '',
                 'equipment_cause_of_need' => $disability->equipment->cause_of_need ?? '',
 
@@ -127,6 +128,7 @@ class DisabilitiesExport implements FromCollection, WithHeadings, WithMapping, W
 
                 // Equipment
                 'equipment_type' => 'Equipment Type',
+                'equipment_subType' => 'Equipment sub Type',
                 'equipment_size' => 'Equipment Size',
                 'equipment_cause_of_need' => 'Equipment Cause Of Need',
 
